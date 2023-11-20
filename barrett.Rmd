@@ -1,0 +1,238 @@
+---
+title: "R.J. Barrett Field Goal Efficiency Evaluation"
+author: "Jarrett Markman"
+date: "2022-11-3"
+output: html_document
+---
+R.J. Barrett was recently given a massive 4 year, $120 million extension with the New York Knicks this past summer. Many Knicks fans loved the moved and also love Barrett as a basketball player. However, many media outlets and those same fans overvalue R.J. Barrett as an excelling player in the league. 
+While Barrett was a great player in college, he has been very inconsistent ever since entering the league. He shows many flashes of being a great performer, as he's played very well in many games so far this young season, however, he will often go through stretches or alterations in his performances over the course of the season throughout his young career. 
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r,message=FALSE, echo=FALSE, warning=FALSE}
+library(tidyverse)
+library(nbastatR)
+Sys.setenv("VROOM_CONNECTION_SIZE" = 131072 * 2)
+```
+
+#### How did he perform last year?
+
+```{r, messages=FALSE, echo=FALSE, warning=FALSE}
+data <- nbastatR::game_logs(2022)
+data <- data %>%
+  filter(namePlayer == 'RJ Barrett')
+```
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data %>%
+  ggplot(aes(x=numberGameTeamSeason, pctFG)) +
+  geom_point(col = 'blue2') +
+  geom_line(col = 'darkorange1') +
+  labs(
+    x="Games",
+    y='Field Goal Percentage',
+    title = 'RJ Barrett Game-by-Game Field Goal Percentage in 2021-2022',
+    caption = 'Jarrett Markman | Data: nbastatR'
+  ) +
+  theme(plot.title = element_text(size = 12, face = 'bold', hjust = 0.5))
+```
+
+While over the course of the year, Barrett became less volatile than in the beginning 20 games, it's very present how often he shot below 40% towards the end of the season. Later in the year, oftentimes, he would go through stretches where he would alternate shooting above and below 40 percent.
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data <- data %>%
+  mutate(
+    fg_below_40 = case_when(
+      pctFG < .4 ~ 1,
+      pctFG > .4 ~ 0,
+      pctFG == .4 ~ 0
+      ),
+    fg_above_40 = case_when(
+      pctFG < .4 ~ 0,
+      pctFG > .4 ~ 1,
+      pctFG == .4 ~ 0
+    ),
+    fg_40 = case_when(
+      pctFG < .4 ~ 0,
+      pctFG > .4 ~ 0,
+      pctFG == .4 ~ 1
+    ),
+    games_below_40 = sum(fg_below_40),
+    games_above_40 = sum(fg_above_40),
+    games_40 = sum(fg_40)
+)
+dataset <- c(34, 32, 4)
+labels <- c("Below 40%", "Above 40%", "At 40%")
+```
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+barplot(dataset, main = 'RJ Barrett Field Goal Percentage Distribution 2021-2022',
+        xlab = 'Field Goal Percentage', ylab = 'Count', names.arg = labels,
+        col = 'darkorange1')
+```
+
+In this bar plot of the thresholds of field goal percentage for R.J. Barrett this past season. While he shot above 40% frequently,it is very concerning that more often than not, he shot below 40%. 
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data %>%
+  ggplot(aes(pctFG)) +
+  geom_histogram(fill = 'darkorange1', col = 'blue2', bins = 3, binwidth = .01) +
+  labs(
+    x = "Field Goal Percentage",
+    y = 'Count',
+    title = 'RJ Barrett Field Goal Percentage Distribution 2021-2022',
+    caption = 'Jarrett Markman | Data: nbastatR'
+  ) +
+  theme(plot.title = element_text(size = 12, face = 'bold', hjust = 0.5))
+```
+
+While the distribution is approximately normal, it's concerning that R.J. Barrett shot at about 37% the most out of all his games, he also frequently shot at 27%, 29%, 30%, 31%, 38%, 40%, 42%, 50%, 53%, 54%, and 60%. His inconsistency with field goal percentage is extremely alarming. 
+
+#### What about his other seasons?
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data <- game_logs(2021) %>%
+  filter(namePlayer == 'RJ Barrett')
+```
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data %>%
+  ggplot(aes(x=numberGameTeamSeason, pctFG)) +
+  geom_point(col = 'blue2') +
+  geom_line(col = 'darkorange1') +
+  labs(
+    x="Games",
+    y='Field Goal Percentage',
+    title = 'RJ Barrett Game-by-Game Field Goal Percentage in 2020-2021',
+    caption = 'Jarrett Markman | Data: nbastatR'
+  ) +
+  theme(plot.title = element_text(size = 12, face = 'bold', hjust = 0.5))
+```
+
+In the 2020-2021 season, R.J. was definitely a lot more consistent player, with a large majority of his performances resulting in a field goal percentage above 40%, but when he performed below 40% there were many of games where he performed extremely poorly, shooting below 30% 12 times.
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data <- data %>%
+  mutate(
+    fg_below_40 = case_when(
+      pctFG < .4 ~ 1,
+      pctFG > .4 ~ 0,
+      pctFG == .4 ~ 0
+      ),
+    fg_above_40 = case_when(
+      pctFG < .4 ~ 0,
+      pctFG > .4 ~ 1,
+      pctFG == .4 ~ 0
+    ),
+    fg_40 = case_when(
+      pctFG < .4 ~ 0,
+      pctFG > .4 ~ 0,
+      pctFG == .4 ~ 1
+    ),
+    games_below_40 = sum(fg_below_40),
+    games_above_40 = sum(fg_above_40),
+    games_40 = sum(fg_40)
+)
+dataset <- c(27, 40, 1)
+labels <- c("Below 40%", "Above 40%", "At 40%")
+```
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+barplot(dataset, main = 'RJ Barrett Field Goal Percentage Distribution 2020-2021',
+        xlab = 'Field Goal Percentage', ylab = 'Count', names.arg = labels,
+        col = 'darkorange1')
+```
+
+It's very evident that Barrett was much more consistent in the 2020-2021 season in comparison to how he performed in 2021-2022. It is concerning that he regressed that poorly last year from how he performed 2 years ago. It is a great sign of Barrett possibly becoming a star in the future, however, that he was able to perform so well and consistent during his sophomore season. 
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data %>%
+  ggplot(aes(pctFG)) +
+  geom_histogram(fill = 'darkorange1', col = 'blue2', bins = 3, binwidth = .01) +
+  labs(
+    x = "Field Goal Percentage",
+    y = 'Count',
+    title = 'RJ Barrett Field Goal Percentage Distribution 2020-2021',
+    caption = 'Jarrett Markman | Data: nbastatR'
+  ) +
+  theme(plot.title = element_text(size = 12, face = 'bold', hjust = 0.5))
+```
+
+This distribution is very symmetric, with a clear peak at 48% percent. It's very clear that R.J. Barrett had a fantastic 2020-2021 season in terms of consistency with field goal percentage. 
+
+#### How consistent was he in his rookie year?
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data <- game_logs(2020) %>%
+   filter(namePlayer == 'RJ Barrett')
+```
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data %>%
+  ggplot(aes(x=numberGameTeamSeason, pctFG)) +
+  geom_point(col = 'blue2') +
+  geom_line(col = 'darkorange1') +
+  labs(
+    x="Games",
+    y='Field Goal Percentage',
+    title = 'RJ Barrett Game-by-Game Field Goal Percentage in 2019-2020',
+    caption = 'Jarrett Markman | Data: nbastatR'
+  ) +
+  theme(plot.title = element_text(size = 12, face = 'bold', hjust = 0.5))
+```
+
+His rookie year is definitely more comparable to how he performed in the last year, frequently alternating between shooting above and below 40%, shooting below 40% most of the time. 
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data <- data %>%
+  mutate(
+    fg_below_40 = case_when(
+      pctFG < .4 ~ 1,
+      pctFG > .4 ~ 0,
+      pctFG == .4 ~ 0
+      ),
+    fg_above_40 = case_when(
+      pctFG < .4 ~ 0,
+      pctFG > .4 ~ 1,
+      pctFG == .4 ~ 0
+    ),
+    fg_40 = case_when(
+      pctFG < .4 ~ 0,
+      pctFG > .4 ~ 0,
+      pctFG == .4 ~ 1
+    ),
+    games_below_40 = sum(fg_below_40),
+    games_above_40 = sum(fg_above_40),
+    games_40 = sum(fg_40)
+)
+dataset <- c(30, 23, 3)
+labels <- c("Below 40%", "Above 40%", "At 40%")
+```
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+barplot(dataset, main = 'RJ Barrett Field Goal Percentage Distribution 2019-2020',
+        xlab = 'Field Goal Percentage', ylab = 'Count', names.arg = labels,
+        col = 'darkorange1')
+```
+
+Like he did last year, more often than not in his rookie season, R.J. Barrett shot below 40% than above 40%. It's much clearer that he was more inconsistent in his rookie season, however, it seems that last year Barrett regressed to hit the same inconsistency that he did in his rookie year. 
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+data %>%
+  ggplot(aes(pctFG)) +
+  geom_histogram(fill = 'darkorange1', col = 'blue2', bins = 3, binwidth = .01) +
+  labs(
+    x = "Field Goal Percentage",
+    y = 'Count',
+    title = 'RJ Barrett Field Goal Percentage Distribution 2019-2020',
+    caption = 'Jarrett Markman | Data: nbastatR'
+  ) +
+  theme(plot.title = element_text(size = 12, face = 'bold', hjust = 0.5))
+```
+
+Like I just stated, it's very clear that Barrett's season last year was similar to his rookie season, however the entire distribution of his field goal percentages over the course of the year is approximately normal. The only problem, however, is that his field goal percentage peaks at about 33%, which is very below average, with most of his field goal percentages appearing below 40%.
+
+#### Conclusion
+
+While the consensus is that R.J. is a budding star, good enough to warrant a contract extension of $30 million per year, given how inconsistent he is, it's very concerning and the large extension may not have been wise given his inconsistencies which are very present. While he had a stellar sophomore season (his best in terms of offensive efficiency), his rookie and junior seasons are very concerning due to extreme volatility (in field goal %) in both years. In both seasons, more often than not, he shot below 40% than he did above 40%. Obviously this 40% field goal percentage threshold is not the only metric used to evaluate players nor is it the "correct" way to evaluate offensive production for NBA players. What is does show however, is that given a target threshold of 40% field goal percentage, R.J. Barrett has under performed that threshold in 2 of his 3 career seasons. While he performed and excelled in his sophomore season, I'm not so sure that his sophomore season mixed with extreme inconsistencies in his other 2 seasons should warrant him that extension. Overall, his inconsistency in field goal percentage is very alarming and is something that should be taken note of, as to whether this issue will persist.
