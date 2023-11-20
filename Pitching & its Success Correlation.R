@@ -1,0 +1,115 @@
+# load libraries
+library(tidyverse)
+library(baseballr)
+# let's look at team data in the regular season for the past 10 world series
+Braves_21 <- bref_team_results("ATL", 2021) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Astros_21 <- bref_team_results("HOU", 2021) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Dodgers_20 <- bref_team_results("LAD", 2020) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Rays_20 <- bref_team_results("TB", 2020) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Nationals_19 <- bref_team_results("WSN", 2019) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Astros_19 <- bref_team_results("HOU", 2019) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+RedSox_18 <- bref_team_results("BOS", 2018) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Dodgers_18 <- bref_team_results("LAD", 2018) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Astros_17 <- bref_team_results("HOU", 2017) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Dodgers_17 <- bref_team_results("LAD", 2017) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Cubs_16 <- bref_team_results("CHC", 2016) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Cleveland_16 <- bref_team_results("CLE", 2016) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Royals_15 <- bref_team_results("KC", 2015) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Mets_15 <- bref_team_results("NYM", 2015) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Giants_14 <- bref_team_results("SF", 2014) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Royals_14 <- bref_team_results("KC", 2014) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+RedSox_13 <- bref_team_results("BOS", 2013) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Cardinals_13 <- bref_team_results("STL", 2013) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Giants_12 <- bref_team_results("SF", 2012) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+Tigers_12 <- bref_team_results("DET", 2012) %>%
+  summarise(RA_per_GM = mean(RA), R_per_GM = mean(R))
+# Now let's combine the winner and loser data together by runs and runs allowed
+WSW_RA_Per_GM <- c(Braves_21$RA_per_GM, 
+                   Dodgers_20$RA_per_GM,
+                   Nationals_19$RA_per_GM,
+                   RedSox_18$RA_per_GM,
+                   Astros_17$RA_per_GM,
+                   Cubs_16$RA_per_GM,
+                   Royals_15$RA_per_GM,
+                   Giants_14$RA_per_GM,
+                   RedSox_13$RA_per_GM,
+                   Giants_12$RA_per_GM)
+WSL_RA_Per_GM <- c(Astros_21$RA_per_GM,
+                   Rays_20$RA_per_GM,
+                   Astros_19$RA_per_GM,
+                   Dodgers_18$RA_per_GM,
+                   Dodgers_17$RA_per_GM,
+                   Cleveland_16$RA_per_GM,
+                   Mets_15$RA_per_GM,
+                   Royals_14$RA_per_GM,
+                   Cardinals_13$RA_per_GM,
+                   Tigers_12$RA_per_GM)
+WSW_R_Per_GM <- c(Braves_21$R_per_GM,
+                  Dodgers_20$R_per_GM,
+                  Nationals_19$R_per_GM,
+                  RedSox_18$R_per_GM,
+                  Astros_17$R_per_GM,
+                  Cubs_16$R_per_GM,
+                  Royals_15$R_per_GM,
+                  Giants_14$R_per_GM,
+                  RedSox_13$R_per_GM,
+                  Giants_12$R_per_GM)
+WSL_R_Per_GM <- c(Astros_21$R_per_GM,
+                  Rays_20$R_per_GM,
+                  Astros_19$R_per_GM,
+                  Dodgers_18$R_per_GM,
+                  Dodgers_17$R_per_GM,
+                  Cleveland_16$R_per_GM,
+                  Mets_15$R_per_GM,
+                  Royals_14$R_per_GM,
+                  Cardinals_13$R_per_GM,
+                  Tigers_12$R_per_GM)
+# Now let's create a data frame for all the data
+World_Series_Results <- data.frame(WSW_RA_Per_GM, WSL_RA_Per_GM, WSW_R_Per_GM, WSL_R_Per_GM)
+World_Series_Results %>%
+  filter(WSW_RA_Per_GM < WSL_RA_Per_GM) %>%
+  select(WSW_RA_Per_GM, WSL_RA_Per_GM)
+World_Series_Results %>%
+  filter(WSW_R_Per_GM > WSL_R_Per_GM) %>%
+  select(WSW_R_Per_GM, WSL_R_Per_GM)
+barplot(as.matrix(World_Series_Results),
+        main = 'Runs and Runs Allowed Per Game',
+        ylab = "Runs",
+        beside = TRUE)
+# now let's look at run averages by winner and loser
+WS_Loser_Avg_Runs_Per_Game <- mean(WSL_R_Per_GM)
+WS_Winner_Avg_Runs_Per_Game <- mean(WSW_R_Per_GM)
+WS_Loser_Avg_Runs_Allowed_Per_Game <- mean(WSL_RA_Per_GM)
+WS_Winner_Avg_Runs_Allowed_Per_Game <- mean(WSW_RA_Per_GM)
+WS_Winner_Avg_Runs_Per_Game - WS_Loser_Avg_Runs_Per_Game
+WS_Winner_Avg_Runs_Allowed_Per_Game - WS_Loser_Avg_Runs_Allowed_Per_Game
+WS_Run_Averages <- data.frame(WS_Loser_Avg_Runs_Allowed_Per_Game, WS_Winner_Avg_Runs_Allowed_Per_Game, WS_Loser_Avg_Runs_Per_Game, WS_Winner_Avg_Runs_Per_Game)
+barplot(as.matrix(WS_Run_Averages),
+        main = "Average Runs and Runs Allowed Per Game Per Year",
+        ylab = "Runs",
+        beside = TRUE)
+runs <- c(WS_Loser_Avg_Runs_Per_Game, WS_Winner_Avg_Runs_Per_Game, WS_Loser_Avg_Runs_Allowed_Per_Game, WS_Winner_Avg_Runs_Allowed_Per_Game)
+names <- c('loser_runs_per_game', 'winner_runs_per_game', 'loser_runs_allowed_per_game', 'winner_runs_allowed_per_game')
+World_Series_Runs_Averages <- data.frame(runs, names)
+World_Series_Runs_Averages %>%
+  ggplot(aes(x=runs, y=names)) +
+  geom_point()
